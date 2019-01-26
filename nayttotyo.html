@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Näyttötehtävä</title>
+    <script src="nayttotyo.js"></script>
+    <style>
+        fieldset.solid {border-style: solid; border-width: 5px; border-color:steelblue; padding: 0%; margin:4px;}
+        textarea.answersheet {background-color:rgb(235, 235, 235); font-weight:bold; border-radius: 0px 25px 25px 10px ; text-align:left; resize:none;}
+        input.answersheet {border-radius: 5px; background-color: rgb(255, 250, 250); text-indent: 4px; margin:2px;}
+        input.button {background-color:snow; font-weight: bold; color:rgb(10, 10, 45);}
+        select.dropdown {background-color:snow; padding: 0px; border-radius: 10px;}
+        div {
+            background-color: aliceblue;
+            padding: 5px;
+            font-family: "Helvetica";
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <form name="frmKisa" novalidate> <!--novalidate, jotta ärsyttävät viallisten arvojen ilmoitukset häviäisivät-->
+        <fieldset class="solid">  <!--Ensimmäinen "kenttä", kisan nimi.-->
+            <div>
+            Kisan nimi: <input type="text" id="txtKisa" placeholder="Kisa" class="answersheet" autofocus>
+            <select id="slcKisatyyppi" class="dropdown"> <!--Valikko kisatyypille.-->
+                <option class="kisatyyppi" value="yksilömäki" id="optyksilö">Yksilömäki</option>    <!--Ei CSS, koska class tarpeellinen muualla.-->
+                <option class="kisatyyppi" value="yhdistetty" id="optYhdistetty">Yhdistetty kisa</option>
+                <option class="kisatyyppi" value="joukkuemäki" id="optJoukkue">Joukkuemäki</option>
+            </select>
+            <select id="slcMäkityyppi" class="dropdown"> <!--Valikko mäkityypille.-->
+                <option class="mäkityyppi" value="normaalimäki" id="optNormaalimäki">Normaalimäki</option>
+                <option class="mäkityyppi" value="suurmäki" id="optSuurmäki">Suurmäki</option>
+            </select>
+            K-piste: <input type="number" id="nbrKPiste" placeholder="60-180" class="answersheet">   <!--min 60 max 180, tarkistus js-puolella, jotta
+                                                            muutkin kuin kokonaisluvut kävisivät.-->
+            <input type="button" value="Tallenna" class="button"
+            onclick="transferKisatiedot(document.frmKisa)"> <!--Kisan tietojen siirto-->
+            <textarea id="txaKisaVastaus" rows="1" cols="60" readonly placeholder="Kisan tiedot..." class="answersheet" ></textarea>
+            </div>
+        </fieldset>
+        <fieldset class="solid" id="flsJoukkue" disabled>   <!--Joukkueiden tiedoille kenttä.-->
+            <div>
+            <legend>Joukkueet</legend>
+            Joukkueen nimi: <input type="text" id="txtJoukkueNimi">
+            <input type="button" value="Tallenna"
+            onclick="transferJoukkue(frmKisa)">
+            </div>
+        </fieldset>
+        <fieldset class="solid" id="flsKisaaja" disabled> <!--Kisaajan tiedoille kenttä.-->
+            <div>
+            <legend>Kilpailijan tiedot</legend>
+            Nimi: <input type="text" id="txtKilpailija" placeholder="Hyppääjän nimi." class="answersheet">
+            Maa:
+            <select id="slcMaa" class="dropdown"> <!--Valikko kilpailijan maalle.-->
+                <option class="maa" value="suomi" id="optSuomi">Suomi</option>
+                <option class="maa" value="ruotsi" id="optRuotsi">Ruotsi</option>
+                <option class="maa" value="saksa" id="optSaksa">Saksa</option>
+                <option class="maa" value="yhdysvallat" id="optYhdysvallat">Yhdysvallat</option>
+                <option class="maa" value="itävalta" id="optItävalta">Itävalta</option>
+            </select>
+            MC-pisteet: <input type="number" id="nbrMC" placeholder="Hyppääjän mc-pisteet." class="answersheet">
+            Joukkueessa?
+            <select id="slcJoukkue" class="dropdown"><!--Valikko kilpailijan mahdolliselle joukkueelle.-->
+                <option value="Ei">Ei</option>
+            </select>
+            <input type="button" value="Tallenna" class="button"
+            onclick="transferKisaajanTiedot(document.frmKisa)"> <!--Kilpailun tietojen siirto-->
+            <textarea id="txaKilpailijaVastaus" rows="5" cols="35" readonly placeholder="Lista kilpailijoista." class="answersheet"></textarea>
+            </div>
+        </fieldset>
+        <fieldset class="solid" id="flsHyppy" disabled>  <!--Hypyn arvionnin kenttä-->
+            <div>
+            <legend>Tulosten syöttö</legend>
+            Hyppääjä: <input type="text" id="txtHyppääjä" placeholder="Kirjoita etsiäksesi" class="dropdown">
+            Hypyn pituus: <input type="number" id="nbrHyppyPisteet" placeholder="Hypyn mitta" class="answersheet"><br>
+            Tuomareiden pisteet:<br>
+            <input type="number" class="answersheet" id="nbrTuomari1" placeholder="4-20"><br>
+            <input type="number" class="answersheet" id="nbrTuomari2" placeholder="4-20"><br>
+            <input type="number" class="answersheet" id="nbrTuomari3" placeholder="4-20"><br>
+            <input type="number" class="answersheet" id="nbrTuomari4" placeholder="4-20"><br>
+            <input type="number" class="answersheet" id="nbrTuomari5" placeholder="4-20"><br>
+            <input type="button" value="Tallenna" class="button"
+            onclick="transferHyppy(document.frmKisa)">  <!--Hypyn tietojen siirto-->
+            </div>
+        </fieldset>
+        <fieldset class="solid">  <!--Lista hyppääjien tuloksista.-->
+            <div>
+            <legend>Hyppyjen tulokset</legend>
+            <textarea id="txaPistetaulukko" readonly rows="5" placeholder="Tulokset..." class="answersheet"></textarea>
+            <textarea id="txaJoukkuePistetaulukko" readonly rows="5" placeholder="Joukkueiden pisteet" class="answersheet"></textarea>
+            </div>
+        </fieldset>
+        <fieldset class="solid">
+            <div>
+            <legend>Lopulliset tulokset</legend>
+            <textarea id="txaTulostaulukko" readonly rows="5" placeholder="Hyppääjien yhteispisteet..." class="answersheet"></textarea>
+            <input type="button" value="Päätä kisa" id="btnMCpisteet" class="button"
+            onclick="transferKilpailu(document.frmKisa)">
+            <textarea id="txaMCTaulukko" readonly rows="5" placeholder="Kilpailijoiden päivitetyt maailmancup-pisteet." class="answersheet"></textarea>
+            </div>
+        </fieldset>
+    </form>
+</body>
+</html>
